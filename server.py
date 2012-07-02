@@ -3,17 +3,36 @@ import tornado.ioloop
 import tornado.web
 import argparse
 from meme import *
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.add_header("Content-Type", "image/png");
-	top = self.get_argument("top","")[:256]; # cut it off at 256 characters long...
-	bottom= self.get_argument("bottom", "")[:256];
-	surface = create_meme(self.get_argument("meme","wonka"), top, bottom);
-	surface.write_to_png(self);
-	surface.finish();
+import json
 
+class MemeGenerator(tornado.web.RequestHandler):
+    def prepare(self):
+        self.options = {"meme":"forever-alone","top":"", "bottom":""}
+        
+    def generate(self):
+        
+        self.add_header("Content-Type", "image/png");
+        surface = create_meme(self.options["meme"], self.options["top"], self.options["bottom"]);
+        surface.write_to_png(self);
+        surface.finish();
+class MainHandler(MemeGenerator):
+    def get(self):
+        meme = self.get_argument("meme", "forever-alone")
+        top = self.get_argument("top","")[:256]; # cut it off at 256 characters long...
+        bottom= self.get_argument("bottom", "")[:256];
+        self.options = {"meme": meme, "top": top, "bottom": bottom}
+        self.generate();
+
+class JSONHandler(MemeGenerator):
+    def get(self, jsonOptions):
+        try:
+            self.options.update(json.loads(jsonOptions))
+        except:
+            pass
+        self.generate()
 application = tornado.web.Application([
-    (r"/", MainHandler),
+    (r"/api/", MainHandler),
+    (r"/api/json/(.*)", JSONHandler),
 ])
 
 if __name__ == "__main__":

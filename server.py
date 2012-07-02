@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import tornado.ioloop
+import tornado.web
+import argparse
+from meme import *
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.add_header("Content-Type", "image/png");
+	top = self.get_argument("top","")[:256]; # cut it off at 256 characters long...
+	bottom= self.get_argument("bottom", "")[:256];
+	surface = create_meme(self.get_argument("meme","wonka"), top, bottom);
+	surface.write_to_png(self);
+	surface.finish();
+
+application = tornado.web.Application([
+    (r"/", MainHandler),
+])
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser();
+    parser.add_argument("--address","-a", type=str, help="The address to listen on, defaults to 127.0.0.1", default="127.0.0.1");
+    parser.add_argument("--port","-p", type=int, help="The port to listen on, defaults to 8888", default=8888);
+    args = parser.parse_args()
+    application.listen(args.port, args.address)
+    tornado.ioloop.IOLoop.instance().start()

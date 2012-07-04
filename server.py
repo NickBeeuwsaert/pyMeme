@@ -22,6 +22,8 @@ class MainHandler(MemeGenerator):
         bottom= self.get_argument("bottom", "")[:256];
         self.options = {"meme": meme, "top": top, "bottom": bottom}
         self.generate();
+    def post(self):
+        self.get();
 
 class JSONHandler(MemeGenerator):
     def get(self, jsonOptions):
@@ -30,6 +32,8 @@ class JSONHandler(MemeGenerator):
         except:
             pass
         self.generate()
+    def post(self,d):
+        self.get(self.request.body)
 application = tornado.web.Application([
     (r"/api/", MainHandler),
     (r"/api/json/(.*)", JSONHandler),

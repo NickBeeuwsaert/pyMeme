@@ -69,11 +69,18 @@ def create_meme(which_meme, top, bottom):
 	top_caption = context.make_text_fit_in_box(top.upper(), (surface.get_width(),surface.get_height()/3));
 	bottom_caption = context.make_text_fit_in_box(bottom.upper(), (surface.get_width(),surface.get_height()/3));
 	context.draw_caption(top_caption[1], top_caption[0]);
-	context.fill_and_stroke((1.0,1.0,1.0), (0.0,0.0,0.0));
+	#context.set_source_rgb(1.0, 1.0, 1.0);
+	#context.fill_preserve();
+	#context.set_source_rgb(0.0, 0.0, 0.0);
+	#context.stroke();*/
 
 	context.translate(0,surface.get_height()-bottom_caption[0]*len(bottom_caption[1]));
 	context.draw_caption(bottom_caption[1], bottom_caption[0]);
-	context.fill_and_stroke((1.0,1.0,1.0), (0.0,0.0,0.0));
+	context.set_line_width(4);
+	context.set_source_rgb(0.0, 0.0, 0.0);
+	context.stroke_preserve();
+	context.set_source_rgb(1.0, 1.0, 1.0);
+	context.fill();
 	return surface
 if __name__ == "__main__":
 	
